@@ -1,2 +1,4 @@
 export {default as Placeable} from './placeable';
-export * from './lane_map';
+export {default as Lane} from './lane';
+export {default as Street} from './street';
+export {default as Intersection} from './intersection';
