@@ -1,6 +1,6 @@
 import actionCreatorFactory from 'redux-typescript-actions';
-import {LaneMap} from 'core';
+import {Texture} from 'pixi.js';
 
 let actionCreator = actionCreatorFactory();
 
-export const startupDataLoaded = actionCreator<{data: LaneMap}>('STARTUP_DATE_LOADED');
+export const startupDataLoaded = actionCreator<{resources: Texture[]}>('STARTUP_DATA_LOADED');

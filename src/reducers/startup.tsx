@@ -1,14 +1,11 @@
 import {Action as ReduxAction} from 'redux';
 import {isType, Action} from 'redux-typescript-actions';
 import {startupDataLoaded} from 'actions';
-import {LaneMap} from 'core';
+import {Intersection} from 'core';
 
-type startupState = {data: LaneMap};
+type startupState = {data: Intersection};
 
-const startupReducer = (state: startupState, action: ReduxAction): startupState => {
-    if(isType(action, startupDataLoaded)) {
-        return {...state, data: action.payload.data};
-    }
+const startupReducer = (state: startupState = {data: null}, action: ReduxAction): startupState => {
     return state;
 }
 

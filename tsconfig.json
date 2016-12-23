@@ -9,7 +9,8 @@
         "noImplicitAny": true,
         "sourceMap": true,
         "outDir": "./dist",
-        "jsx": "react"
+        "jsx": "react",
+        "experimentalDecorators": true
     },
     "exclude": [
         "node_modules",
