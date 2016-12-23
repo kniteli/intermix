@@ -28,6 +28,10 @@ interface IntersectionSchema {
         texture: Texture,
         position: Vec
     }
+    stage: {
+        width: number,
+        height: number
+    }
 }
 
 type Positioner = (position: Vec) => void
@@ -127,6 +131,10 @@ export default class Intersection extends Renderable<IntersectionSchema> {
                 width: streets.north.width,
                 height: streets.west.width,
                 position: add(intersection.positions.intersection, [-streets.north.width/2, -streets.west.width/2])
+            },
+            stage: {
+                width: state.stage.width,
+                height: state.stage.height
             }
         };
     }
@@ -134,6 +142,10 @@ export default class Intersection extends Renderable<IntersectionSchema> {
         if(this.state.intersection.texture && this.state.intersection.texture !== this.intersection.texture) {
             this.intersection.texture = this.state.intersection.texture;
         }
+        this.renderable.width = this.state.stage.width;
+        this.renderable.height = this.state.stage.height;
+        this.intersection.width = this.state.intersection.width;
+        this.intersection.height = this.state.intersection.height;
     }
     animate(t: number) {
         _(this.state.streets).forEach((street: any, key: string) => this.positioners[key](street.position));

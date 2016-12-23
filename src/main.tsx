@@ -21,7 +21,7 @@ export const main = () => {
         <Provider store={store}>
             <div>
                 <Playmat stage={intersection}/>
-                <Selector draggable={draggable} />
+                <Selector />
             </div>
         </Provider>,
         document.getElementById('approot')

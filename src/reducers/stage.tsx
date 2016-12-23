@@ -1,5 +1,6 @@
 import {Action as ReduxAction} from 'redux';
 import {isType, Action} from 'redux-typescript-actions';
+import {canvasResized} from 'actions';
 
 type stageState = {
     width: number,
@@ -12,6 +13,10 @@ const defaultStageState: stageState = {
 }
 
 const stageReducer = (state: stageState = defaultStageState, action: ReduxAction): stageState => {
+    if(isType(action, canvasResized)) {
+        let {width, height} = action.payload;
+        return {...state, width: width, height: height};
+    }
     return state;
 }
 

@@ -11,6 +11,8 @@ interface StreetSchema {
     length: number
     orientation: string
     lanes: LaneData[]
+    added_lanes: LaneData[]
+    removed_lanes: LaneData[]
 }
 
 export default class Street extends Renderable<StreetSchema> {
@@ -32,20 +34,26 @@ export default class Street extends Renderable<StreetSchema> {
             return mapped;
         });
         store.subscribe(connect(this.mapStateToSchema)(this));
+        this.renderable.interactive = true;
     }
-    mapStateToSchema(state: any) {
+    mapStateToSchema(state: any): StreetSchema {
         let {lanes, streets} = state;
         let owned_lanes = lanes.by_cardinal[this.cardinal];
+        let added_lanes: number[] = owned_lanes.filter((id: number) => this.state && !this.state.lanes.find((lane: LaneData) => id === lane.id));
+        let removed_lanes: number[] = owned_lanes.filter((id: number) => false);
         return {
             ...streets[this.cardinal],
-            lanes: owned_lanes.map((id: number) => lanes.by_id[id])
+            lanes: owned_lanes.map((id: number):LaneData => lanes.by_id[id]),
+            added_lanes: added_lanes.map((id: number): LaneData => lanes.by_id[id]),
+            removed_lanes: removed_lanes.map((id: number): LaneData => lanes.by_id[id])
         }
     }
     update() {
         var total_width = 0;
         _(this.children).forEach(lane => {
+            let lane_state = _(this.state.lanes).find(lane_data => lane.id === lane_data.id); 
             lane.renderable.position.y = total_width;
-            total_width += _(this.state.lanes).filter(lane_data => lane.id !== lane_data.id).value().pop().width;
+            total_width += lane_state.width;
         })
         this.lane_container.rotation = (() => {
             switch(this.state.orientation) {
@@ -55,6 +63,12 @@ export default class Street extends Renderable<StreetSchema> {
                     return Math.PI/2;
             }
         })();
+        _(this.state.added_lanes).forEach((lane) => {
+            let mapped = new Lane(this.store, this.cardinal, lane.id);
+            this.store.subscribe(connect(mapped.mapStateToSchema)(mapped));
+            this.lane_container.addChild(mapped.renderable);
+            this.children.push(mapped)
+        });
     }
     animate(t: number) {
         

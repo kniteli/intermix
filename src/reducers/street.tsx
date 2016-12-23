@@ -1,6 +1,6 @@
 import {Action as ReduxAction} from 'redux';
 import {isType, Action} from 'redux-typescript-actions';
-import {laneAdded, laneRemoved, canvasResized} from 'actions';
+import {laneAdded, laneRemoved, canvasResized, dropDragEntity, laneResizeMove} from 'actions';
 import {Lane} from 'core';
 
 type Street = {
@@ -40,18 +40,30 @@ const defaultStreets: Streets = {
     },
 }
 
+const perpendicular = (cardinal: string) => {
+    if(cardinal === 'north' || cardinal === 'south') {
+        return ['east', 'west'];
+    } else if (cardinal === 'west' || cardinal === 'east') {
+        return ['north', 'south'];
+    }
+}
+
 const streetReducer = (state: Streets = defaultStreets, action: ReduxAction): Streets => {
     if(isType(action, laneAdded)) {
-        let {cardinal, lane} = action.payload;
-        let street = state[cardinal];
-        return {...state, [cardinal]: {...street, width: street.width + lane.state.width}};
-    }
-    if(isType(action, laneRemoved)) {
-        let {cardinal, lane} = action.payload;
-        let street = state[cardinal];
-        return {...state, [cardinal]: {...street, width: street.width - lane.state.width}};
-    }
-    if(isType(action, canvasResized)) {
+        let new_lane = action.payload;
+        let street = state[new_lane.cardinal];
+        let [opp1, opp2] = perpendicular(new_lane.cardinal);
+        return {
+            ...state, 
+            [new_lane.cardinal]: {...street, width: street.width + new_lane.width},
+            [opp1]: {...state[opp1], length: state[opp1].length - new_lane.width/2 },
+            [opp2]: {...state[opp2], length: state[opp2].length - new_lane.width/2 }
+        };
+    } else if(isType(action, laneRemoved)) {
+        let removed_lane = action.payload;
+        let street = state[removed_lane.cardinal];
+        return {...state, [removed_lane.cardinal]: {...street, width: street.width - removed_lane.width}};
+    } else if(isType(action, canvasResized)) {
         return {
             ...state,
             north: {
@@ -70,6 +82,17 @@ const streetReducer = (state: Streets = defaultStreets, action: ReduxAction): St
                 ...state.west,
                 length: (action.payload.width - state.north.width)/2
             },
+        }
+    } else if(isType(action, laneResizeMove)) {
+        let [opp1, opp2] = perpendicular(action.payload.cardinal);
+        return {
+            ...state,
+            [action.payload.cardinal]: {
+                ...state[action.payload.cardinal],
+                width: state[action.payload.cardinal].width + action.payload.new_width
+            },
+            [opp1]: {...state[opp1], length: state[opp1].length - action.payload.new_width/2 },
+            [opp2]: {...state[opp2], length: state[opp2].length - action.payload.new_width/2 }
         }
     }
     return state;
