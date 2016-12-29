@@ -29,6 +29,7 @@ export const main = () => {
     loader.add('road', 'assets/road.png')
             .add('sidewalk', 'assets/sidewalk.png')
             .add('sidewalk-light', 'assets/sidewalk-light.png')
+            .add('grass', 'assets/grass.png')
             .load((loader, resources) => {
                 store.dispatch(
                     startupDataLoaded({

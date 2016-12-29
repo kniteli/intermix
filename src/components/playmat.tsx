@@ -11,6 +11,7 @@ interface PlaymatOwnProps extends React.Props<Playmat> {
 interface PlaymatStateProps {
     width: number
     height: number
+    loaded: boolean
 }
 
 interface PlaymatDispatchProps {
@@ -62,7 +63,9 @@ class Playmat extends React.Component<PlaymatProps, PlaymatState> {
     private animate() {
         // this is the main render call that makes pixi draw your container and its children.
         this.props.stage.animate((new Date).valueOf());
-        this.renderer.render(this.props.stage.renderable);
+        if(this.props.loaded) {
+            this.renderer.render(this.props.stage.renderable);
+        }
 
         // start the timer for the next animation loop
         if(this.state.running) {
@@ -83,7 +86,8 @@ class Playmat extends React.Component<PlaymatProps, PlaymatState> {
 const mapStateToProps = (state: any) => {
     return {
         width: state.stage.width,
-        height: state.stage.height
+        height: state.stage.height,
+        loaded: state.resources.loaded
     }
 }
 
